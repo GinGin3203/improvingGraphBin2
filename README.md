@@ -14,7 +14,6 @@ Purpose of the project was to explore label propagation algorithm for metagenomi
 ### Future development
 Obtained data may help to implement efficient binning algorithm with usage of SPAdes API.
 
-## Installation
 ## List of programs used in project
 * Improved GraphBin2 (works with SPAdes assemblies)
 
