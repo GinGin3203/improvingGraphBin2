@@ -15,7 +15,7 @@ Purpose of the project was to explore label propagation algorithm for metagenomi
 Obtained data may help to implement efficient binning algorithm with usage of SPAdes API.
 
 ## List of programs used in project
-* Improved GraphBin2 (works with SPAdes assemblies)
+* We developed improved version of GraphBin2 (which works with SPAdes assemblies)
 
 ### Binning evaluation
 * Minimap2 as a part of [metaquast](https://github.com/ablab/quast) (gold standart file creation)
@@ -50,6 +50,7 @@ conda activate graphbin2
 
 ## Usage
 ### GraphBin2_improved general usage
+...
 
 ### Binning benchmarking
 Benchmarking is performed using **Amber** and it's accessory utilities.
@@ -70,6 +71,8 @@ To add biobox format header to existing binning file you can run:
 convert_bins.py --insep "\t" --outsep "\t" --biobox-header \
  --sample-id SAMPLEID bins.tsv > bins_with_biobox_header.tsv
 ```
+*convert_bins.py may be also used for delimiter change, contig names stripping, removing of multiple-binned contigs.*
+Check `convert_bins.py -h` for more information. 
 
 You also need a *gold standart* file for evaluation using *Amber*. This file contains perfect binning of dataset and can be obtained by aligning assembly to references. To achieve this we used *metaquast.py*.
 ```bash
@@ -94,7 +97,8 @@ Now everything is ready for benchmarking. Run *amber.py* as follows:
 ```bash
 amber.py -o output_report_dir \
          -g gold_standart.tsv \
-         -l binning1_label,binning2_label,binning3_label
-		 binning1.tsv binning2.tsv binning3.tsv
+         -l binning1_label,binning2_label,binning3_label \
+         binning1.tsv binning2.tsv binning3.tsv
 ```
-Output directory contains detailed HTML report.
+Output directory contains detailed HTML report. For the most cases we used metrics heatmap to compare binnings.
+![](./images/Amber_heatmap_example.png)
