@@ -56,7 +56,7 @@ conda activate graphbin2
 Benchmarking is performed using **Amber** and it's accessory utilities.
 
 All files passed to *amber.py* must satisfy requirements of [CAMI binning Bioboxes format](https://github.com/bioboxes/rfc/tree/master/data-format).
-
+<hr>
 To create single binning file which satisfies this format from multiple files representing each bin (common case for many binners output) you can use *convert_fasta_bins_to_biobox_format.py* utility.
 
 ```bash
@@ -64,7 +64,7 @@ python convert_fasta_bins_to_biobox_format.py * -o bins.tsv
 ```
 
 Location of this script should be ".../site-packages/src/utils/".
-
+<hr>
 To add biobox format header to existing binning file you can run:
 
 ```bash
@@ -73,12 +73,13 @@ convert_bins.py --insep "\t" --outsep "\t" --biobox-header \
 ```
 *convert_bins.py may be also used for delimiter change, contig names stripping, removing of multiple-binned contigs.*
 Check `convert_bins.py -h` for more information. 
-
+<hr>
 You also need a *gold standart* file for evaluation using *Amber*. This file contains perfect binning of dataset and can be obtained by aligning assembly to references. To achieve this we used *metaquast.py*.
 ```bash
 metaquast.py -o quast_results_scaffolds_0.8 -r dir_with_references -t 16 \
  -u --fragmented -m 0 --min-identity 80.0 scaffolds.fasta
 ```
+
 Then we need to extract contig mapping from minimap output.
 ```bash
 cd quast_results_scaffolds_0.8/combined_reference/contigs_reports/minimap_output/
@@ -90,7 +91,7 @@ The last step is to add column containing length of contigs.
 python add_length_column.py -g gold_standart_raw.tsv -f scaffolds.fasta > gold_standart.tsv
 ```
 Location of this script should be “…/site-packages/src/utils/”.
-
+<hr>
 Ensure that contig names format in gold standart match contig names format in files with bins. BINID field format may be different among files.
 
 Now everything is ready for benchmarking. Run *amber.py* as follows:
