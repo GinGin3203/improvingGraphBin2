@@ -72,9 +72,11 @@ convert_bins.py --insep "\t" --outsep "\t" --biobox-header \
  --sample-id SAMPLEID bins.tsv > bins_with_biobox_header.tsv
 ```
 *convert_bins.py may be also used for delimiter change, contig names stripping, removing of multiple-binned contigs.*
-Check `convert_bins.py -h` for more information. 
+Check convert_bins.py -h for more information. 
 <hr>
+
 You also need a *gold standart* file for evaluation using *Amber*. This file contains perfect binning of dataset and can be obtained by aligning assembly to references. To achieve this we used *metaquast.py*.
+
 ```bash
 metaquast.py -o quast_results_scaffolds_0.8 -r dir_with_references -t 16 \
  -u --fragmented -m 0 --min-identity 80.0 scaffolds.fasta
