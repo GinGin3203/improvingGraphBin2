@@ -18,8 +18,8 @@ Obtained data may help to implement efficient binning algorithm with usage of SP
 * Improved GraphBin2 (works with SPAdes assemblies)
 
 ### Binning evaluation
-* Metaquast (gold standart file creation)
-* Amber (binning benchmark)
+* Minimap2 as a part of [metaquast](https://github.com/ablab/quast) (gold standart file creation)
+* [Amber](https://github.com/CAMI-challenge/AMBER) (binning benchmark)
 
 ### Binners
 * [Metabat2](https://bitbucket.org/berkeleylab/metabat/src/master/) 
@@ -48,4 +48,53 @@ conda env create environment.yml
 conda activate graphbin2
 ```
 
+## Usage
+### GraphBin2_improved general usage
 
+### Binning benchmarking
+Benchmarking is performed using **Amber** and it's accessory utilities.
+
+All files passed to *amber.py* must satisfy requirements of [CAMI binning Bioboxes format](https://github.com/bioboxes/rfc/tree/master/data-format).
+
+To create single binning file which satisfies this format from multiple files representing each bin (common case for many binners output) you can use *convert_fasta_bins_to_biobox_format.py* utility.
+
+```bash
+python convert_fasta_bins_to_biobox_format.py * -o bins.tsv
+```
+
+Location of this script should be ".../site-packages/src/utils/".
+
+To add biobox format header to existing binning file you can run:
+
+```bash
+convert_bins.py --insep "\t" --outsep "\t" --biobox-header \
+ --sample-id SAMPLEID bins.tsv > bins_with_biobox_header.tsv
+```
+
+You also need a *gold standart* file for evaluation using *Amber*. This file contains perfect binning of dataset and can be obtained by aligning assembly to references. To achieve this we used *metaquast.py*.
+```bash
+metaquast.py -o quast_results_scaffolds_0.8 -r dir_with_references -t 16 \
+ -u --fragmented -m 0 --min-identity 80.0 scaffolds.fasta
+```
+Then we need to extract contig mapping from minimap output.
+```bash
+cd quast_results_scaffolds_0.8/combined_reference/contigs_reports/minimap_output/
+
+cut -d " " -f 12,13 scaffolds.coords.filtered | sort -u | sed -r "s/(.+) (.+)/\2\t\1/g" > gold_standart_raw.tsv
+```
+The last step is to add column containing length of contigs.
+```bash
+python add_length_column.py -g gold_standart_raw.tsv -f scaffolds.fasta > gold_standart.tsv
+```
+Location of this script should be “…/site-packages/src/utils/”.
+
+Ensure that contig names format in gold standart match contig names format in files with bins. BINID field format may be different among files.
+
+Now everything is ready for benchmarking. Run *amber.py* as follows:
+```bash
+amber.py -o output_report_dir \
+         -g gold_standart.tsv \
+         -l binning1_label,binning2_label,binning3_label
+		 binning1.tsv binning2.tsv binning3.tsv
+```
+Output directory contains detailed HTML report.
