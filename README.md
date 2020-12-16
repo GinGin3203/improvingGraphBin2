@@ -59,7 +59,7 @@ python3 /path/to/GraphBin2_with_examination/graphbin2 <your parameters>
 ## Usage
 ### GraphBin2_with_examination general usage
 Here we will list only parameters which we added to ease experimentation with GraphBin2. All the parameters listed below are optional. You can find the list of parameters of the original software package in [GraphBin2 repository](https://github.com/Vini2/GraphBin2).
-```bash
+```
   --gold_standard GOLD_STANDARD
                         path to the gold standard binning file. [default: ]
   --add_true_depth ADD_TRUE_DEPTH
