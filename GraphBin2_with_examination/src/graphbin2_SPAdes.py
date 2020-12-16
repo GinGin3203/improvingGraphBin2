@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 import csv
 import time
 import pandas as pd
@@ -36,16 +35,15 @@ ap.add_argument("--depth", required=False, type=int, default=5, help="maximum de
 ap.add_argument("--threshold", required=False, type=float, default=1.5, help="threshold for determining inconsistent vertices. [default: 1.5]")
 ap.add_argument("--delimiter", required=False, type=str, default=",", help="delimiter for input/output results [default: , (comma)]")
 ap.add_argument("--nthreads", required=False, type=int, default=8, help="number of threads to use. [default: 8]")
-ap.add_argument("--add_true_depth", required=False, type=int, default=0, help="graph depth of adding true contigs")
-ap.add_argument("--skip_preref", required=False, default=False, action="store_true", help="Skip prerefinement stage")  #####
-ap.add_argument("--cov_threshold", required=False, type=int, default=0, help="Lower threshold for contig coverage")    #####
-ap.add_argument("--len_threshold", required=False, type=int, default=0, help="Lower threshold for contig length")    #####
-ap.add_argument("--gold_standart", required=False, type=str, default='', help="Gold standart file for perfect initial binning creation") #####
-ap.add_argument("--save_interval", required=False, type=int, default=0, help="Indicates number of passed iterations needed for current binning save. (5 - save for every 5 iterations). 0 - disable intermediate binning saving") #####
-ap.add_argument("--save_heap", required=False, default=False, action="store_true", help="Save heap from every 'save_interval' iteration of label propagation") #####
+ap.add_argument("--add_true_depth", required=False, type=int, default=0, help="depth of adding true contigs with respect to BFS origin vertex")
+ap.add_argument("--skip_ref", required=False, default=False, action="store_true", help="flag for skipping refinement stage")  #####
+ap.add_argument("--cov_threshold", required=False, type=int, default=0, help="new threshold for contig coverage")    #####
+ap.add_argument("--len_threshold", required=False, type=int, default=0, help="new threshold for contig length")    #####
+ap.add_argument("--save_interval", required=False, type=int, default=0, help="indicates number of passed iterations needed for current binning save. (5 - save for every 5 iterations). 0 - disable intermediate binning saving") #####
+ap.add_argument("--save_heap", required=False, default=False, action="store_true", help="save heap from every 'save_interval' iteration of label propagation") #####
+ap.add_argument("--gold_standard", required=False, type=str, default="", help="path to the gold standard file for evaluation")
 args = vars(ap.parse_args())
 
-gold_standard = args["gold_standard"]
 contigs_file = args["contigs"]
 assembly_graph_file = args["graph"]
 contig_paths = args["paths"]
@@ -56,12 +54,12 @@ depth = args["depth"]
 threshold = args["threshold"]
 delimiter = args["delimiter"]
 nthreads = args["nthreads"]
-add_true_depth = args["add_true_depth"]
 
-skip_preref = args["skip_preref"]
+add_true_depth = args["add_true_depth"]
+skip_ref = args["skip_ref"]
 cov_threshold = args["cov_threshold"]
 len_threshold = args["len_threshold"]
-gold_standart = args["gold_standart"]
+gold_standard = args["gold_standard"]
 save_interval = args["save_interval"]
 save_heap = args["save_heap"]
 
@@ -501,6 +499,8 @@ def runBFS(node, threhold=depth, add_depth=0):
         else:
             for neighbour in assembly_graph.neighbors(active_node, mode=ALL):
                 if neighbour not in visited:
+
+                    # Code segment for propagation of true labels
                     if gold_standard != "" and add_depth > 0 \
                             and neighbour in gs_seq_dict.keys():
 
@@ -649,7 +649,7 @@ if save_interval:   #####
 
 # Refine labels of inconsistent vertices
 #-----------------------------------------------------
-if not skip_preref:  #####
+if not skip_ref:  #####
     print("\nRefining labels of inconsistent vertices...")
 
     iter_num = 1

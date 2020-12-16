@@ -24,12 +24,6 @@ parser.add_argument("--assembler",
                     type=str,
                     help="name of the assembler used (SPAdes, SGA or Flye)")
 
-parser.add_argument("--gold_standard",
-                    required=False,
-                    type=str,
-                    default="",
-                    help="gold standard file for evaluation")
-
 parser.add_argument("--graph", 
                     required=True,
                     type=str,
@@ -90,15 +84,16 @@ parser.add_argument("--nthreads",
                     default=8, 
                     help="number of threads to use. [default: 8]")
 
-parser.add_argument("--add_true_depth",
-                    required=False,
-                    type=int,
-                    default=0,
-                    help="graph depth of adding true contigs")
+parser.add_argument("--gold_standard", required=False, type=str, default="", help="path to the gold standard binning file. [default: ""]")
+parser.add_argument("--add_true_depth", required=False, type=int, default=0, help="depth of adding true labels with respect to BFS origin vertex. [default: 0]")
+parser.add_argument("--skip_ref", required=False, default=False, action="store_true", help="flag for skipping refinement stage. [default: False]")  #####
+parser.add_argument("--cov_threshold", required=False, type=int, default=0, help="minimum threshold for contig coverage. [default: 0]")    #####
+parser.add_argument("--len_threshold", required=False, type=int, default=0, help="minimum threshold for contig length. [default: 0]")    #####
+parser.add_argument("--save_interval", required=False, type=int, default=0, help="indicates number of passed iterations needed for current binning save. (5 - save for every 5 iterations). 0 - disable intermediate binning saving. [default: 0]") #####
+parser.add_argument("--save_heap", required=False, default=False, action="store_true", help="flag for saving heap from every 'save_interval' iteration of label propagation. [default: False]") #####
 
 args = vars(parser.parse_args())
 
-gold_standard = args["gold_standard"]
 assembler = args["assembler"]
 assembly_graph_file = args["graph"]
 contigs = args["contigs"]
@@ -111,7 +106,14 @@ depth = args["depth"]
 threshold = args["threshold"]
 delimiter = args["delimiter"]
 nthreads = args["nthreads"]
-add_true_depth = args['add_true_depth']
+add_true_depth = args["add_true_depth"]
+skip_ref = args["skip_ref"]
+cov_threshold = args["cov_threshold"]
+len_threshold = args["len_threshold"]
+gold_standard = args["gold_standard"]
+save_interval = args["save_interval"]
+save_heap = args["save_heap"]
+
 if gold_standard == "" and add_true_depth != 0:
     print("\nCannot set depth of adding true contigs without the gold "
           "standard file\n")
@@ -217,12 +219,9 @@ if threshold < 1.0:
 delimiters = [",", ";", " ", "\t", "|"]
 
 if delimiter not in delimiters:
-    if 't' not in delimiter:
-        print("\nPlease enter a valid delimiter")
-        print("Exiting GraphBin2...\nBye...!\n")
-        sys.exit(1)
-    else:
-        delimiter = "\t"
+    print("\nPlease enter a valid delimiter")
+    print("Exiting GraphBin2...\nBye...!\n")
+    sys.exit(1)
 
 
 
@@ -236,7 +235,8 @@ if nthreads <= 0:
 # Run GraphBin2
 #---------------------------------------------------
 if assembler.lower() == "spades":
-    cmdGraphBin2 = """python "{0}/src/graphbin2_SPAdes.py" --graph "{1}" --contigs "{2}" --paths "{3}" --binned "{4}" --output "{5}" --prefix "{6}" --depth "{7}" --threshold "{8}" --delimiter "{9}" --nthreads "{10}" --gold_standard "{11}" --add_true_depth "{12}" """.format(
+    cmdGraphBin2 = """python "{0}/src/graphbin2_SPAdes.py" --graph "{1}" --contigs "{2}" --paths "{3}" --binned "{4}" --output "{5}" --prefix "{6}" --depth "{7}" --threshold "{8}" --delimiter "{9}" --nthreads "{10}" --gold_standard "{11}" --add_true_depth "{12}"  
+    --skip_ref "{13}" --cov_threshold "{14}" --len_threshold "{15}" --save_interval "{16}" --save_heap "{17}" """.format(
         os.path.dirname(__file__), 
         assembly_graph_file,
         contigs,
@@ -249,11 +249,17 @@ if assembler.lower() == "spades":
         delimiter,
         nthreads,
     gold_standard,
-    add_true_depth)
+    add_true_depth,
+    skip_ref,
+    cov_threshold,
+    len_threshold,
+    save_interval,
+    save_heap
+    )
 
 elif assembler.lower() == "sga":
     cmdGraphBin2 = """python "{0}/src/graphbin2_SGA.py" --graph "{1}" --contigs "{2}" --binned "{3}" --abundance "{4}" --output "{5}" --prefix "{6}" --depth "{7}" --threshold "{8}" --delimiter "{9}"  --nthreads "{10}" """.format(
-        os.path.dirname(__file__), 
+        os.path.dirname(__file__),
         assembly_graph_file,
         contigs,
         contig_bins_file, 
