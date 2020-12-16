@@ -1,7 +1,7 @@
 # improvingGraphBin2
 Bioinformatics Institute Autumn 2020 Project: Improving binning of metagenomic data.
 
-## Purpose and objectives of project
+## Purpose and objectives of the project
 ### Purpose
 Purpose of the project was to explore label propagation algorithm for metagenomic binning which is used in GraphBin2 and to make an attempt to improve this approach.
 
