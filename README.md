@@ -44,6 +44,7 @@ Obtained data may help to implement efficient binning algorithm with usage of SP
 ### Installation using conda
 ```bash
 git clone https://github.com/GinGin3203/improvingGraphBin2.git GraphBin2_improved
+cd GraphBin2_improved
 conda env create environment.yml
 conda activate graphbin2
 ```
